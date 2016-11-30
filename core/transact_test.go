@@ -30,7 +30,7 @@ func TestAccountTransferSpendChange(t *testing.T) {
 	accounts.IndexAccounts(query.NewIndexer(db, c, pinStore))
 	go accounts.ProcessBlocks(ctx)
 
-	acc, err := accounts.Create(ctx, []string{testutil.TestXPub.String()}, 1, "", nil, nil)
+	acc, err := accounts.Create(ctx, []string{testutil.TestXPub.String()}, 1, "", nil, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +49,13 @@ func TestAccountTransferSpendChange(t *testing.T) {
 		t.Fatal(err)
 	}
 	coretest.SignTxTemplate(t, ctx, tmpl, &testutil.TestXPrv)
-	err = txbuilder.FinalizeTx(ctx, c, p, bc.NewTx(*tmpl.Transaction))
+
+	txdata, err := bc.NewTxDataFromBytes(tmpl.RawTransaction)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = txbuilder.FinalizeTx(ctx, c, p, bc.NewTx(*txdata))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +72,13 @@ func TestAccountTransferSpendChange(t *testing.T) {
 		t.Fatal(err)
 	}
 	coretest.SignTxTemplate(t, ctx, tmpl, &testutil.TestXPrv)
-	err = txbuilder.FinalizeTx(ctx, c, p, bc.NewTx(*tmpl.Transaction))
+
+	txdata, err = bc.NewTxDataFromBytes(tmpl.RawTransaction)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = txbuilder.FinalizeTx(ctx, c, p, bc.NewTx(*txdata))
 	if err != nil {
 		t.Fatal(err)
 	}
